@@ -17,7 +17,6 @@ static float avg(float* x, int size) {
 }
 
 float var(float* x, int size) {
-    //float pi=0, sum=0, sumPow=0, var1;
     float var1 , sumPow=0, pi = 0;
     for(int i=0; i < size; i++) {
 //        sum += x[i];
@@ -105,21 +104,3 @@ int main(){
 	cout<<"done"<<endl;
 	return 0;
 }
-// int main() {
-// int size;
-// cout << "please enter size\n";
-// cin >> size;
-// float x [size];
-// float var1; 
-// cout << "please enter X\n";
-// for(int i=0; i<size; i++){
-//     cin >> x[i];    
-// }
-// var1 = var(x, size);
-// cout << var1 << "\n";
-// for(int i=0; i<size; i++){
-// cout << x[i] << "\n";    
-// }
-// cout << *x;
-//     return 0;
-// }
