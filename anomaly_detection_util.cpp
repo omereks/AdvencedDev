@@ -4,74 +4,73 @@
 #include <stdlib.h>
 using namespace std;
 
-static float avg(float* x, int size) {
-    float pi=0, sum=0;
+//getting avg of array
+static float getAvg(float* x, int size) {
+    float sum=0;    
+    //caclute sum
     for(int i=0; i < size; i++) {
         sum += x[i]; 
     }
-    if (size * sum == 0) {
+    //check if vals are ok
+    if (size ==0  || sum == 0) {
         return 0;
     }
-    pi = (float) 1 / size * sum;
-    return pi;
+    return sum / size ;
 }
 
+
 float var(float* x, int size) {
-    //omer was her
-    float var1 , sumPow=0, pi = 0;
-    for(int i=0; i < size; i++) {
-//        sum += x[i];
-          sumPow += pow(x[i] , 2);
-    }        
-         
-//    pi = (float) 1 / size * sum;
-    pi = avg(x , size);
-        if (size * sumPow == 0) {
-        return 0;
-    }
-    var1 = (float) 1 / size * sumPow - pow(pi , 2);
-    return var1; 
+    //crate xPow by 2
+    float sumXPow = 0;
+    for(int i=0 ; i<size ; i++) {
+        sumXPow += pow(x[i], 2);
+    }  
+    float ret = sumXPow/size - pow(getAvg(x, size), 2);
+    return ret;
 }
 
 float cov(float* x, float* y, int size) {
-    float covarince = 0, sum = 0;
-    for(int i = 0; i < size; i++) {
-        sum += (x[i] - avg(x , size)) * (y[i] - avg(y , size));
+    //crate xyArray
+    float xyArray[size];
+    for(int i=0 ; i<size ; i++) {
+        xyArray[i] = x[i]*y[i];
     }
 
-    covarince = sum / size;   
-    return covarince;
+    return getAvg(xyArray,size) - (getAvg(x,size) * getAvg(y,size));
 }
 
 float pearson(float* x, float* y, int size) {
-    float pear = cov(x, y, size) / sqrt(var(x , size)) * sqrt(var(y , size));
-    return pear; 
+    return (cov(x, y, size)) / (sqrt( var(x , size) ) * (sqrt( var(y , size) )));
 }
 
 Line linear_reg(Point** points, int size){
     float a, b;
-    float x[size], y[size];
-    for(int i = 0; i < size; i++) {
-        x[i] = points[i]->x;
-        y[i] = points[i]->y;
+    float xP[size], yP[size];
+    //extract x and y from points into array
+    for(int i=0 ; i<size ; i++) {
+        xP[i] = points[i]->x;
+        yP[i] = points[i]->y;
     } 
-    a = cov(x , y, size) / var(x , size);
-    b = avg(y , size) - a * avg(x , size);
-    return Line(a, b);  
+    a = cov(xP, yP, size) / var(xP , size);
+    b = getAvg(yP, size) - a*getAvg(xP, size);
+    return Line(a, b);
 }
 
 float dev(Point p,Point** points, int size){
-    float fx, dis;
-    Line l = linear_reg(points , size);
-    fx = l.f(p.x);
-    dis = abs(fx - p.y);
-return dis;
+    Line curLine = linear_reg(points , size);
+return dev(p, curLine);
 
 }
 
 float dev(Point p,Line l) {
-return 0;
+    return abs(l.f(p.x) - p.y);
 }
+
+
+
+
+//import from the Submit 
+
 
 bool wrong(float val, float expected){
 	return val<expected-0.001 || val>expected+0.001;
@@ -79,7 +78,9 @@ bool wrong(float val, float expected){
 
 // this is a simple test to put you on the right track
 int main(){
-	const int N=10;
+	
+    
+    const int N=10;
 	float x[]={1,2,3,4,5,6,7,8,9,10};
 	float y[]={2.1,4.2,6.1,8.1,10.3,12.2,14.4,16.1,18.2,20.3};
 
@@ -103,23 +104,6 @@ int main(){
 		delete ps[i];
 
 	cout<<"done"<<endl;
+    
 	return 0;
 }
-// int main() {
-// int size;
-// cout << "please enter size\n";
-// cin >> size;
-// float x [size];
-// float var1; 
-// cout << "please enter X\n";
-// for(int i=0; i<size; i++){
-//     cin >> x[i];    
-// }
-// var1 = var(x, size);
-// cout << var1 << "\n";
-// for(int i=0; i<size; i++){
-// cout << x[i] << "\n";    
-// }
-// cout << *x;
-//     return 0;
-// }
