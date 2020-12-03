@@ -4,16 +4,18 @@
 #include <vector>
 #include "AnomalyDetector.h"
 #include "SimpleAnomalyDetector.h"
+#include "anomaly_detection_util.h"
 #include <fstream>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <math.h>
 
+
 using namespace std;
 
 // this is a simple test to put you on the right track
 void generateTrainCSV(float a1,float b1, float a2, float b2){
-	ofstream out("trainFile1.csv");
+	ofstream out("trainFile2.csv");
 	out<<"A,B,C,D"<<endl;
 	Line ac(a1,b1);
 	Line bd(a2,b2);
@@ -70,12 +72,24 @@ int main(){
 	//	A-C: y=a1*x+b1
 	//	B-D: y=a2*x+b2
 
-	generateTrainCSV(a1,b1,a2,b2);
-	TimeSeries ts("trainFile1.csv");
-	SimpleAnomalyDetector ad;
-	ad.learnNormal(ts);
-	vector<correlatedFeatures> cf=ad.getNormalModel();
+	//generateTrainCSV(a1,b1,a2,b2);
+	cout<<"creat ts"<<endl;
+	TimeSeries ts("trainFile2.csv");
+	float abcc = ts.getVal(1,1);
+	
+	float arr[ts.vecCSV.size()];
+	ts.getColumn(arr, 0);
+	
+	float arr2[ts.vecCSV.size()];
+	ts.getColumn(arr2, 1);
+	
+	float ch = pearson(arr,arr2,ts.vecCSV.size());
 
+	cout<<abcc<<endl;
+//	SimpleAnomalyDetector ad;
+//	ad.learnNormal(ts);
+//	vector<correlatedFeatures> cf=ad.getNormalModel();
+/**
 	if(cf.size()!=2)
 		cout<<"wrong size of correlated features (-40)"<<endl;
 	else
@@ -105,7 +119,7 @@ int main(){
 
 	if(falseAlarms>0)
 		cout<<"you have "<<falseAlarms<<" false alarms (-"<<min(30,falseAlarms*3)<<")"<<endl;
-
+	*/
 	cout<<"done"<<endl;
 	return 0;
 }
