@@ -23,10 +23,7 @@ public:
 // --------------------------------------
 
 // implement
-Circle findMinCircle(Point** points,size_t size){
-	
-	return Circle(Point(0,0),0);
-}
+
 
 // you may add helper functions here
 
@@ -101,6 +98,29 @@ bool contains(const Circle &myCircle, const vector<Point> &ps) {
 	}
 	return true;
 }
+Circle makeDiameter(const Point &a, const Point &b) {
+	Point c = Point((a.x + b.x) / 2, (a.y + b.y) / 2);
+	float dis = max(distance(c, a), distance(c, b));
+	Circle circ = Circle(c, dis);
+	return circ;
+}
+
+Circle makeCircumcircle(const Point &a, const Point &b, const Point &c) {
+	// Mathematical algorithm from Wikipedia: Circumscribed circle
+	double ox = (min(min(a.x, b.x), c.x) + max(max(a.x, b.x), c.x)) / 2;
+	double oy = (min(min(a.y, b.y), c.y) + max(max(a.y, b.y), c.y)) / 2;
+	double ax = a.x - ox,  ay = a.y - oy;
+	double bx = b.x - ox,  by = b.y - oy;
+	double cx = c.x - ox,  cy = c.y - oy;
+	double d = (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) * 2;
+	if (d == 0)
+		return Circle(Point(0,0), 0);
+	double x = ((ax*ax + ay*ay) * (by - cy) + (bx*bx + by*by) * (cy - ay) + (cx*cx + cy*cy) * (ay - by)) / d;
+	double y = ((ax*ax + ay*ay) * (cx - bx) + (bx*bx + by*by) * (ax - cx) + (cx*cx + cy*cy) * (bx - ax)) / d;
+	Point p = Point(ox + x, oy + y);
+	double r = max(max(distance(p, a), distance(p, b)), distance(p, c));
+	return Circle(p, r);
+}
 
 
 /*---- Smallest enclosing circle algorithm ----*/
@@ -119,26 +139,24 @@ Circle makeSmallestEnclosingCircle(const vector<Point> &points) {
 	std::shuffle(shuffled.begin(), shuffled.end(), randGen);
 	
 	// Progressively add points to circle or recompute circle
-	Circle c = Circle::INVALID;
+	Circle c = Circle(Point(0,0), 0);
 	for (size_t i = 0; i < shuffled.size(); i++) {
 		const Point &p = shuffled.at(i);
-		if (c.r < 0 || !c.contains(p))
+		if (c.radius < 0 || !contains(c, p))
 			c = makeSmallestEnclosingCircleOnePoint(shuffled, i + 1, p);
 	}
 	return c;
 }
 
-/*---- omer end ----*/
 
-/*---- ron start ----*/
 
 // One boundary point known
 static Circle makeSmallestEnclosingCircleOnePoint(const vector<Point> &points, size_t end, const Point &p) {
-	Circle c{p, 0};
+	Circle c = Circle(p, 0);
 	for (size_t i = 0; i < end; i++) {
 		const Point &q = points.at(i);
-		if (!c.contains(q)) {
-			if (c.r == 0)
+		if (!contains(c, q)) {
+			if (c.radius == 0)
 				c = makeDiameter(p, q);
 			else
 				c = makeSmallestEnclosingCircleTwoPoints(points, i + 1, p, q);
@@ -148,39 +166,41 @@ static Circle makeSmallestEnclosingCircleOnePoint(const vector<Point> &points, s
 }
 
 
+
 // Two boundary points known
 static Circle makeSmallestEnclosingCircleTwoPoints(const vector<Point> &points, size_t end, const Point &p, const Point &q) {
 	Circle circ = makeDiameter(p, q);
-	Circle left  = Circle::INVALID;
-	Circle right = Circle::INVALID;
+	Circle left  = Circle(Point(0,0), 0);
+	Circle right = Circle(Point(0,0), 0);
 	
 	// For each point not in the two-point circle
-	Point pq = q.subtract(p);
+	Point pq = subtract(q, p);
 	for (size_t i = 0; i < end; i++) {
 		const Point &r = points.at(i);
-		if (circ.contains(r))
+		if (contains(circ, r))
 			continue;
 		
 		// Form a circumcircle and classify it on left or right side
-		double cross = pq.cross(r.subtract(p));
+		double crosss = cross(pq, subtract(r, p));
 		Circle c = makeCircumcircle(p, q, r);
-		if (c.r < 0)
+		if (c.radius < 0)
 			continue;
-		else if (cross > 0 && (left.r < 0 || pq.cross(c.c.subtract(p)) > pq.cross(left.c.subtract(p))))
+		else if (crosss > 0 && (left.radius < 0 || cross(pq, subtract(c.center, p)) > cross(pq, subtract(left.center, p))))
 			left = c;
-		else if (cross < 0 && (right.r < 0 || pq.cross(c.c.subtract(p)) < pq.cross(right.c.subtract(p))))
+		else if (crosss < 0 && (right.radius < 0 || cross(pq, subtract(c.center, p)) < cross(pq, subtract(right.center, p))))
 			right = c;
 	}
-	
-	// Select which circle to return
-	if (left.r < 0 && right.r < 0)
+	/*---- omer end ----*/
+
+	/*---- ron start ----*/
+	if (left.radius < 0 && right.radius < 0)
 		return circ;
-	else if (left.r < 0)
+	else if (left.radius < 0)
 		return right;
-	else if (right.r < 0)
+	else if (right.radius < 0)
 		return left;
 	else
-		return left.r <= right.r ? left : right;
+		return left.radius <= right.radius ? left : right;
 }
 
 /*---- ron end ----*/
@@ -188,27 +208,119 @@ static Circle makeSmallestEnclosingCircleTwoPoints(const vector<Point> &points, 
 /*---- omer start ----*/
 
 
-Circle makeDiameter(const Point &a, const Point &b) {
-	Point c{(a.x + b.x) / 2, (a.y + b.y) / 2};
-	return Circle{c, max(distance(c, a), distance(c, b))};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool Finder(Point p1, Point p2){
+	if (p1.x == p2.x && p1.y == p2.y)
+	{
+		return true;
+	}
+	return false;
+	
 }
 
+static Circle finalCircle = Circle(Point(0,0),0);
 
-Circle makeCircumcircle(const Point &a, const Point &b, const Point &c) {
+// http://www.sunshine2k.de/coding/java/Welzl/Welzl.html
+
+void minidisc2(const Point &a, const Point &b, const Point &c){
 	// Mathematical algorithm from Wikipedia: Circumscribed circle
-	double ox = (min(min(a.x, b.x), c.x) + max(max(a.x, b.x), c.x)) / 2;
-	double oy = (min(min(a.y, b.y), c.y) + max(max(a.y, b.y), c.y)) / 2;
-	double ax = a.x - ox,  ay = a.y - oy;
-	double bx = b.x - ox,  by = b.y - oy;
-	double cx = c.x - ox,  cy = c.y - oy;
-	double d = (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) * 2;
-	if (d == 0)
-		return Circle(Point(0,0), 0);
-	double x = ((ax*ax + ay*ay) * (by - cy) + (bx*bx + by*by) * (cy - ay) + (cx*cx + cy*cy) * (ay - by)) / d;
-	double y = ((ax*ax + ay*ay) * (cx - bx) + (bx*bx + by*by) * (ax - cx) + (cx*cx + cy*cy) * (bx - ax)) / d;
-	Point p{ox + x, oy + y};
-	double r = max(max(distance(p, a), distance(p, b)), distance(p, c));
-	return Circle{p, r};
+		double ox = (min(min(a.x, b.x), c.x) + max(max(a.x, b.x), c.x)) / 2;
+		double oy = (min(min(a.y, b.y), c.y) + max(max(a.y, b.y), c.y)) / 2;
+		double ax = a.x - ox,  ay = a.y - oy;
+		double bx = b.x - ox,  by = b.y - oy;
+		double cx = c.x - ox,  cy = c.y - oy;
+		double d = (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) * 2;
+		if (d == 0){
+			finalCircle = Circle(Point(0,0), 0);
+			return;
+		}
+		double x = ((ax*ax + ay*ay) * (by - cy) + (bx*bx + by*by) * (cy - ay) + (cx*cx + cy*cy) * (ay - by)) / d;
+		double y = ((ax*ax + ay*ay) * (cx - bx) + (bx*bx + by*by) * (ax - cx) + (cx*cx + cy*cy) * (bx - ax)) / d;
+		Point poi = Point(ox + x, oy + y);
+		double rad = max(max(distance(poi, a), distance(poi, b)), distance(poi, c));
+		
+		finalCircle = Circle(poi, rad);
+		return;
 }
+
+
+vector<Point> minidisc(vector<Point> p, vector<Point> r){
+	if (p.size() == 0 || r.size() == 3)
+	{
+		minidisc2(r[0],r[1],r[2]);
+	}
+	else
+	{
+		Point curP = p.back();
+		p.pop_back();
+		vector<Point> d = minidisc(p, r);
+
+		
+		for (int j = 0; j < d.size(); j++)
+		{
+			if ((d[j].x == curP.x) && (d[j].y == curP.y))
+			{
+				return d;
+			}
+		}
+
+		r.push_back(curP);
+		vector<Point> ret = minidisc(p, r);
+		return ret;
+	}
+	return p;
+	//makeCircumcircle
+}
+
+Circle findMinCircle(Point** points,size_t size){
+		
+	vector<Point> vecPoint;
+	for (int i = 0; i < size; i++)
+	{
+		vecPoint.push_back(*points[i]);
+	}
+	
+	minidisc(vecPoint, vecPoint);
+
+
+
+	//Circle c = makeSmallestEnclosingCircle(vecPoint);
+	
+	return finalCircle;
+	
+}
+
 #endif /* MINCIRCLE_H_ */
 /*---- omer end ----*/

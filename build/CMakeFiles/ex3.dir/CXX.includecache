@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/omer/BIU/AdvencedDev/MainTrain.cpp
+iostream
+-
+vector
+-
+stdlib.h
+-
+time.h
+-
+math.h
+-
+minCircle.h
+/home/omer/BIU/AdvencedDev/minCircle.h
+chrono
+-
+
+/home/omer/BIU/AdvencedDev/minCircle.h
+iostream
+-
+algorithm
+-
+cmath
+-
+cstddef
+-
+random
+-
+

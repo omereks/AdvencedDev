@@ -1,0 +1,1 @@
+/bin/x86_64-linux-gnu-g++-9  -g  -rdynamic CMakeFiles/ex3.dir/MainTrain.cpp.o  -o ex3 
