@@ -66,36 +66,37 @@ using std::min;
 
 /*---- omer start ----*/
 
-Point Point::subtract(const Point &p) const {
-	return Point{x - p.x, y - p.y};
+Point subtract(const Point &myPoint, const Point &p) {
+	return Point{myPoint.x - p.x, myPoint.y - p.y};
 }
 
 
-double Point::distance(const Point &p) const {
-	return std::hypot(x - p.x, y - p.y);
+double distance(const Point &myPoint, const Point &p) {
+	return std::hypot(myPoint.x - p.x, myPoint.y - p.y);
 }
 
 
-double Point::cross(const Point &p) const {
-	return x * p.y - y * p.x;
+double cross(const Point &myPoint, const Point &p) {
+	return myPoint.x * p.y - myPoint.y * p.x;
 }
+
 
 
 /*---- Members of struct Circle ----*/
 
-const Circle Circle::INVALID{Point{0, 0}, -1};
+//const Circle Circle::INVALID{Point{0, 0}, -1};
 
-const double Circle::MULTIPLICATIVE_EPSILON = 1 + 1e-14;
+const double MULTIPLICATIVE_EPSILON = 1 + 1e-14;
 
 
-bool Circle::contains(const Point &p) const {
-	return c.distance(p) <= r * MULTIPLICATIVE_EPSILON;
+bool contains(const Circle &myCircle, const Point &p) {
+	return distance(myCircle.center, p) <= myCircle.radius * MULTIPLICATIVE_EPSILON;
 }
 
 
-bool Circle::contains(const vector<Point> &ps) const {
+bool contains(const Circle &myCircle, const vector<Point> &ps) {
 	for (const Point &p : ps) {
-		if (!contains(p))
+		if (!contains(myCircle, p))
 			return false;
 	}
 	return true;
@@ -109,9 +110,7 @@ static Circle makeSmallestEnclosingCircleTwoPoints(const vector<Point> &points, 
 
 static std::default_random_engine randGen((std::random_device())());
 
-/*---- omer end ----*/
 
-/*---- ron start ----*/
 
 // Initially: No boundary points known
 Circle makeSmallestEnclosingCircle(const vector<Point> &points) {
@@ -129,6 +128,9 @@ Circle makeSmallestEnclosingCircle(const vector<Point> &points) {
 	return c;
 }
 
+/*---- omer end ----*/
+
+/*---- ron start ----*/
 
 // One boundary point known
 static Circle makeSmallestEnclosingCircleOnePoint(const vector<Point> &points, size_t end, const Point &p) {
@@ -188,7 +190,7 @@ static Circle makeSmallestEnclosingCircleTwoPoints(const vector<Point> &points, 
 
 Circle makeDiameter(const Point &a, const Point &b) {
 	Point c{(a.x + b.x) / 2, (a.y + b.y) / 2};
-	return Circle{c, max(c.distance(a), c.distance(b))};
+	return Circle{c, max(distance(c, a), distance(c, b))};
 }
 
 
@@ -201,11 +203,11 @@ Circle makeCircumcircle(const Point &a, const Point &b, const Point &c) {
 	double cx = c.x - ox,  cy = c.y - oy;
 	double d = (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by)) * 2;
 	if (d == 0)
-		return Circle::INVALID;
+		return Circle(Point(0,0), 0);
 	double x = ((ax*ax + ay*ay) * (by - cy) + (bx*bx + by*by) * (cy - ay) + (cx*cx + cy*cy) * (ay - by)) / d;
 	double y = ((ax*ax + ay*ay) * (cx - bx) + (bx*bx + by*by) * (ax - cx) + (cx*cx + cy*cy) * (bx - ax)) / d;
 	Point p{ox + x, oy + y};
-	double r = max(max(p.distance(a), p.distance(b)), p.distance(c));
+	double r = max(max(distance(p, a), distance(p, b)), distance(p, c));
 	return Circle{p, r};
 }
 #endif /* MINCIRCLE_H_ */
