@@ -28,12 +28,12 @@ public:
 // --------------------------------------
 
 // implement
-
-
+//calc the distants between 2 points
 float distance(const Point &p1, const Point &p2) {
 	return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));;
 }
 
+//making a circle out of 2 points
 Circle trivalCircle2(Point p1, Point p2){
 	float radius = distance (p1, p2) / 2;
 
@@ -45,6 +45,7 @@ Circle trivalCircle2(Point p1, Point p2){
 
 }
 
+//making a circle out of 3 points from Wikipdia
 Circle trivalCircle3(const Point& p1, const Point&  p2, const Point&  p3){
 	float bx = p2.x - p1.x;
 	float by = p2.y - p1.y;
@@ -65,7 +66,8 @@ Circle trivalCircle3(const Point& p1, const Point&  p2, const Point&  p3){
 	return Circle(center, radius);
 }
 
-bool is_valid_circle(const Circle& c, const vector<Point>& pointsR) 
+//check if point is neccesary for making a circle
+bool ifPointIsInCircle(const Circle& c, const vector<Point>& pointsR) 
 { 
     for (int i = 0; i < pointsR.size(); i++)
 	{
@@ -76,6 +78,7 @@ bool is_valid_circle(const Circle& c, const vector<Point>& pointsR)
     return true; 
 } 
 
+//recursiv Wexler Algo
 Circle minidisc(vector<Point>& p, vector<Point> r, int n){
 	if (n == 0 || r.size() == 3)
 	{	
@@ -98,7 +101,7 @@ Circle minidisc(vector<Point>& p, vector<Point> r, int n){
 		for (int i = 0; i < 3; i++) { 
 			for (int j = i + 1; j < 3; j++) { 
 				Circle c = trivalCircle2(p[i], p[j]); 
-				if (is_valid_circle(c, p)) 
+				if (ifPointIsInCircle(c, p)) 
 					return c; 
 			} 
 		} 
@@ -123,7 +126,7 @@ Circle minidisc(vector<Point>& p, vector<Point> r, int n){
 	return minidisc(p, r, n-1);
 }
 
-
+//our method
 Circle findMinCircle(Point** points,size_t size){	
 	vector<Point> vecPoint;
 	for (int i = 0; i < size; i++)
