@@ -25,12 +25,14 @@ chrono
 /home/omer/BIU/AdvencedDev/minCircle.h
 iostream
 -
-algorithm
+vector
 -
-cmath
+stdlib.h
 -
-cstddef
+time.h
 -
-random
+math.h
+-
+chrono
 -
 

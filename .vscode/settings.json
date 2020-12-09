@@ -7,6 +7,9 @@
         "functional": "cpp",
         "regex": "cpp",
         "tuple": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp"
     }
 }
